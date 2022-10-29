@@ -23,104 +23,112 @@
 #### [Kendala](#kendala-1)
 
 ## Soal 1
-Sebutkan web server yang digunakan pada "monta.if.its.ac.id"!
+WISE akan dijadikan sebagai DNS Master, Berlint akan dijadikan DNS Slave, dan Eden akan digunakan sebagai Web Server. Terdapat 2 Client yaitu SSS, dan Garden. Semua node terhubung pada router Ostania, sehingga dapat mengakses internet (1)
 ### Jawaban
-- Gunakan display filter `tcp contains monta` untuk mendapatkan jawaban yang dicari
-![image](https://user-images.githubusercontent.com/71868354/192100366-6d65200a-f857-4211-8569-1c9aac3ecfa2.png)
-- DItemukan server yang digunakan `nginx/1.10.3\r\n`
+-
 
 ## Soal 2
-Ishaq sedang bingung mencari topik ta untuk semester ini , lalu ia datang ke website monta dan menemukan detail topik pada website “monta.if.its.ac.id” , judul TA apa yang dibuka oleh ishaq ?
+bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise (2).
 ### Jawaban
-- Gunakan display filter `tcp contains detailTopik` untuk dapat menemukan judul detail topik yang dimaksud akan dilakukan search dengan urutan /index.php/topik/detailTopik/194 di website monta.if.its.ac.id
-![image](https://user-images.githubusercontent.com/71868354/192100469-0b3a5501-646f-4f08-8829-1aa04b0e3c97.png)
-- Topik Tugas Akhir : Evaluasi unjuk kerja User Space Filesystem (FUSE) oleh WAHYU SUADI yang didapatkan dari Request URI : /index.php/topik/detailTopik/194
+-
 
 
 ## Soal 3
-Filter sehingga wireshark hanya menampilkan paket yang menuju port 80!
+Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden (3).
 ### Jawaban
-- Gunakan display filer `tcp.dstport == 80`
-### Screenshot Pengerjaan
-![image](https://user-images.githubusercontent.com/71868354/192100513-0beb7ebb-c15f-49bf-ad3f-f5d91fa4dee9.png)
+-
 
 
 ## Soal 4
-Filter sehingga wireshark hanya mengambil paket yang berasal dari port 21!
+ Buat juga reverse domain untuk domain utama (4).
 ### Jawaban
-- Gunakan display filer `tcp.srcport == 21 || udp.srcport == 21`
-### Screenshot Pengerjaan
-![image](https://user-images.githubusercontent.com/71868354/192100613-14379656-4d76-421b-9c24-03d8f45fadac.png)
+-
 
 ## Soal 5
-Filter sehingga wireshark hanya mengambil paket yang berasal dari port 443!
+buatlah juga Berlint sebagai DNS Slave untuk domain utama WISE(5).
 ### Jawaban
-- Gunakan display filer `tcp.srcport == 443`
-### Screenshot Pengerjaan
-![image](https://user-images.githubusercontent.com/71868354/192100670-12a3e0c1-cfd5-4049-9a48-0c2459a9c6eb.png)
+-
 
 ## Soal 6
-Filter sehingga wireshark hanya menampilkan paket yang menuju ke lipi.go.id !
+buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation (6).
 ### Jawaban
-- Gunakan display filter `http.host==lipi.go.id`
-### Screenshot Pengerjaan
-![image](https://user-images.githubusercontent.com/71868354/192100687-ea1d7498-f2e5-4ede-8e9f-79b0facaaebe.png)
+-
 
 
 ## Soal 7
-Filter sehingga wireshark hanya mengambil paket yang berasal dari ip kalian!
+buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden (7).
 ### Jawaban
-- Gunakan display filer `src host 192.168.37.181 / src host (IP)`
-### Screenshot Pengerjaan
-![image](https://user-images.githubusercontent.com/71868354/192100698-9d512f6c-ff11-4c7b-b7be-6c0fd6da5397.png)
+-
 
-
-### Soal 8 - 10
-Di sebuah planet bernama Viltrumite, terdapat Kementerian Komunikasi dan Informatika yang baru saja menetapkan kebijakan baru. Dalam kebijakan baru tersebut, pemerintah dapat mengakses data pribadi masyarakat secara bebas jika memang dibutuhkan, baik dengan maupun tanpa persetujuan pihak yang bersangkutan. Sebagai mahasiswa yang sedang melaksanakan program magang di kementerian tersebut, kalian mendapat tugas berupa penyadapan percakapan mahasiswa yang diduga melakukan tindak kecurangan dalam kegiatan Praktikum Komunikasi Data dan Jaringan Komputer 2022. Selain itu, terdapat sebuah password rahasia (flag) yang diduga merupakan milik sebuah organisasi bawah tanah yang selama ini tidak sejalan dengan pemerintahan Planet Viltrumite. Tunggu apa lagi, segera kerjakan tugas magang tersebut agar kalian bisa mendapatkan pujian serta kenaikan jabatan di kementerian tersebut!
 
 ### Soal 8
-Telusuri aliran paket dalam file .pcap yang diberikan, cari informasi berguna berupa percakapan antara dua mahasiswa terkait tindakan kecurangan pada kegiatan praktikum. Percakapan tersebut dilaporkan menggunakan protokol jaringan dengan tingkat keandalan yang tinggi dalam pertukaran datanya sehingga kalian perlu menerapkan filter dengan protokol yang tersebut.
-
+Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com (8).
 #### Jawaban
-- Gunakan display filer `tcp`, lalu dari sana dapat dilihat komunikasi banyak terjadi antara IP 127.0.0.1 dengan IP 127.0.1.1. 
-![image](https://user-images.githubusercontent.com/71868354/192100725-4553b08f-9266-45c4-8a24-a8294a7a8ac1.png)
+-
 
-- Kemudian dapat kita follow tcp stream dan didapatkan sadapan message sebagai berikut : 
-![image](https://user-images.githubusercontent.com/71868354/192100734-ff427fc9-be9f-45ad-bd9b-13cf258a195a.png)
 
 ### Soal 9
-Terdapat laporan adanya pertukaran file yang dilakukan oleh kedua mahasiswa dalam percakapan yang diperoleh, carilah file yang dimaksud! Untuk memudahkan laporan kepada atasan, beri nama file yang ditemukan dengan format [nama_kelompok].des3 dan simpan output file dengan nama “flag.txt”.
-
+Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home (9).
 #### Jawaban
-- Dari sadapan message sebelumnya didapati bahwa pertukaran file ada di port 9002, sehingga dapat kita lakukan display filter `tcp.port == 9002 and tcp.len>0`
-
-![image](https://user-images.githubusercontent.com/71868354/192100751-37ff34d9-5cf4-4375-aa8b-015ed9f6a7ca.png)
-
-- Didapati 2 package yang penting adalah no.61 kemudian kita save data dari payload secara raw menjadi file.des3 untuk dilakukan deskripsi dengan openssl des3
-
-![image](https://user-images.githubusercontent.com/71868354/192100765-e89ab62f-a5cf-462d-8ff1-01cc1755d352.png)
-
+-
 
 ### Soal 10
-Temukan password rahasia (flag) dari organisasi bawah tanah yang disebutkan di atas!
-Note: Terkait soal nomor 9 dan 10, file yang didapatkan tidak perlu dikumpulkan, cukup tulis flag yang didapatkan ke dalam laporan kalian 🙏.
+Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/eden.wise.yyy.com (10).
 
 #### Jawaban
-Password rahasianya adalah nakano karena saya udah mbaca manganya sampai chapter 100an :)
-Dari situ, file.des3 kita dekrip memakai openssl des3 dengan password yang diketahui sebagai berikut :
-![image](https://user-images.githubusercontent.com/71868354/192100790-e2f2002e-2872-42e0-bca0-35af40199de6.png)
+-
 
-Flag nya adalah `JaRkOm2022{8uK4N_CtF_k0k_h3h3h3}`
+### Soal 11
+Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja (11).
+
+#### Jawaban
+-
+
+### Soal 12
+Tidak hanya itu, Loid juga ingin menyiapkan error file 404.html pada folder /error untuk mengganti error kode pada apache (12)
+
+#### Jawaban
+-
+
+### Soal 13
+Loid juga meminta Franky untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.eden.wise.yyy.com/public/js menjadi www.eden.wise.yyy.com/js (13).
+
+#### Jawaban
+-
+
+### Soal 14
+Loid meminta agar www.strix.operation.wise.yyy.com hanya bisa diakses dengan port 15000 dan port 15500 (14)
+
+#### Jawaban
+-
+
+### Soal 15
+dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy (15)
+
+#### Jawaban
+-
+
+### Soal 16
+dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com (16).
+
+#### Jawaban
+-
+
+### Soal 17
+Karena website www.eden.wise.yyy.com semakin banyak pengunjung dan banyak modifikasi sehingga banyak gambar-gambar yang random, maka Loid ingin mengubah request gambar yang memiliki substring “eden” akan diarahkan menuju eden.png. Bantulah Agent Twilight dan Organisasi WISE menjaga perdamaian! (17)
+
+#### Jawaban
+-
 
 ## Pembagian Tugas
 | Nama                        | Nomor      |
 |:---------------------------:|:----------:|
-| Davian Benito               | 8, 9, 10   |
-| Fitra Agung Diassyah Putra  | 3, 4, 5, 6 |
-| Yusron Nugroho Aji          | 1, 2, 7    |
+| Davian Benito               | 4 - 7      |
+| Fitra Agung Diassyah Putra  | 8 - 17     |
+| Yusron Nugroho Aji          | 1 - 3      |
 
 ## Revisi
-Tidak ada
+8 - 17
 
 ## Kendala
 Tidak ada

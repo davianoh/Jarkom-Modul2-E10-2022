@@ -17,6 +17,13 @@
 - [Soal 8](#soal-8)
 - [Soal 9](#soal-9)
 - [Soal 10](#soal-10)
+- [Soal 11](#soal-11)
+- [Soal 12](#soal-12)
+- [Soal 13](#soal-13)
+- [Soal 14](#soal-14)
+- [Soal 15](#soal-15)
+- [Soal 16](#soal-16)
+- [Soal 17](#soal-17)
 #### [Resource Soal](Resources)
 #### [Pembagian Tugas](#pembagian-tugas-1)
 #### [Revisi](#revisi-1)
@@ -93,8 +100,6 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.197.2.1
 ```
-
-<img width="780" alt="topologi" src="https://user-images.githubusercontent.com/87480529/198831839-329de6bf-9aeb-4bea-bf64-d889e44b6782.png">
 
 Lalu tidak lupa untuk menghubungkan semua node ubuntu cabang dari Ostania agar dapat terhubung dengan internet dari Ostania. Caranya sebagai berikut : 
 1. Pada Ostania dipanggil `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.197.0.0/16`. Lalu cek resolv.conf nya pada path `/etc/resolv.conf`. Didapatkan nameserver 192.168.122.1
@@ -364,117 +369,93 @@ Buka node client dan lakukan testing memanggil website yang telah dibuat, seharu
 ### Soal 8
 Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com (8).
 #### Jawaban
--
+- Pertama dilakukan instalasi PHP, Apache2, Library Apache2 pada WISE dengan menjalankan command berikut : 
+```
+apt-get update
+apt-get install apache2 -y
+apt-get install php -y
+apt-get install libapache2-mod-php7.0 -y
 
+apt-get install wget -y
+apt-get install unzip -y
+```
+Lalu download resource yang diperlukan memakai command `wget` dan unzip file tersebut memakai command `unzip`. 
+Kemudian buat folder baru dan copas semua isi dari file zip ke dalamnya. 
+```
+mkdir /var/www/wise.E10.com
+cp ~/wise/home.html /var/www/wise.E10.com
+cp ~/wise/index.php /var/www/wise.E10.com
+```
+Lalu copy file 000-default.conf kedalam sites-available dan ubah namanya
+`cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/wise.E10.com.conf`
+Kemudian atur konfigurasinya sesuai module dengan nama yang sesuai : 
+![image](https://user-images.githubusercontent.com/71868354/198832322-e0115cd6-defa-47f6-bab7-21386cb26e87.png)
+Aktifkan konfigurasi website dengan commmand `a2ensite wise.E10.com.conf` dan restart Apache2 dengan command `service apache2 restart`
+Bila sudah maka kita dapat mengeceknya dengan melakukan testing pada node client. Sebelumnya kita harus menginstall Lynx pada node client tersebut dengan `apt-get install lynx -y`
+Bila benar, seharusnya kita dapat mengecek hasil dari webserver tersebut. 
 
 ### Soal 9
 Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home (9).
 #### Jawaban
--
+- Edit file wise.E10.com.conf dan konfigurasikan sebagai berikut : 
+```
+ <Directory /var/www/wise.E10.com>
+     Options +FollowSymLinks -Multiviews
+     AllowOverride All
+ </Directory>
+```
+buat file .htaccess pada folder /var/www/wise.E10.com dan konfigurasikan sebagai berikut : 
+![image](https://user-images.githubusercontent.com/71868354/198832577-09a116b7-7704-4ce2-8275-d46e633a6300.png)
+Lalu aktifkan module rewrite dengan command `a2enmod rewrite` dan restart apache2 dengan command `service apache2 restart`. 
+Bila selesai maka kita dapat melakukan testing di node client dengan cek command `lynx wise.E10.com/home`. Seharusnya isi website sudah dapat tertampilkan
 
 ### Soal 10
 Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/eden.wise.yyy.com (10).
 
 #### Jawaban
--
+- Pertama unzip file resource lalu buat directory baru dan copykan semua file tersebut kesana juga copykan file 000-default.conf ke dalam folder sites-available dan ubah namanya. 
+```
+mkdir /var/www/super.wise.E10.com
+cp -r ~/eden.wise/error /var/www/wise.E10.com
+cp -r ~/eden.wise/public /var/www/wise.E10.com
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/eden.wise.E10.com.conf
+```
+Buka file tersebut dan konfigurasikan sesuai berikut : 
+![image](https://user-images.githubusercontent.com/71868354/198832322-e0115cd6-defa-47f6-bab7-21386cb26e87.png)
+Aktifkan konfigurasi website dan restart apache2
+```
+a2ensite eden.wise.E10.com.conf
+service apache2 restart
+```
+Setelah selesai, kita dapat melakukan testing di node client dan memanggil command berikut : 
+```
+lynx eden.wise.E10.com
+lynx www.eden.wise.E10.com
+```
 
 ### Soal 11
 Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja (11).
 
 #### Jawaban
-Buka file /etc/apache2/sites-available/eden.wise.E10.com.conf kemudian tambahkan konfigurasi dibawah ini
- ```
-echo ' 
-
-	<Directory/var/www/wise.E10.com>
-     		Options +Indexes
- 	</Directory>
-' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
-  ```
-Setelah itu restart apache2 dengan 
-   ```
-service apache2 restart
-  ```
+-
 
 ### Soal 12
 Tidak hanya itu, Loid juga ingin menyiapkan error file 404.html pada folder /error untuk mengganti error kode pada apache (12)
 
 #### Jawaban
-Buka lagi file /etc/apache2/sites-available/eden.wise.E10.com.conf, kemudian tambahkan konfigurasi seperti dibawah ini
-   ```
-echo ' 
-	ErrorDocument 404 /error/404.html
-' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
-  ```
-setelah itu restart apache2 dengan 
-   ```
-service apache2 restart
-  ```
+-
+
 ### Soal 13
 Loid juga meminta Franky untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.eden.wise.yyy.com/public/js menjadi www.eden.wise.yyy.com/js (13).
 
 #### Jawaban
-Buka lagi file /etc/apache2/sites-available/eden.wise.E10.com.conf, kemudian tambahkan konfigurasi seperti dibawah ini
-   ```
-echo ' 
-	 Alias "/assets/js" "/var/www/wise.E10.com/assets/javascript"
-' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
-  ```
-setelah itu restart apache2 dengan 
-   ```
-service apache2 restart
-  ```
+-
 
 ### Soal 14
 Loid meminta agar www.strix.operation.wise.yyy.com hanya bisa diakses dengan port 15000 dan port 15500 (14)
 
 #### Jawaban
-jika sreix.operation.wise.zip sudah di extract maka lansung buat direktori dengan nama
-   ```
-mkdir /var/www/strix.operation.wise.E10.com
-
-  ```
-Setelah itu copy isi zip ke /var/www/strix.operation.wise.E10.com
-     ```
-cp ~/strix.operation.wise/* /var/www/strix.operation.wise.E10.com
-  ```
-Jika sudah maka copy 000-default.conf ke /etc/apache2/sites-available/strix.operation.wise.E10.com.conf
-     ```
-cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/strix.operation.wise.E10.com.conf
-  ```
-Setelah itu buka etc/apache2/sites-available/strix.operation.wise.E10.com.conf kemudian konfigurasi seperti dibawah ini
-  ```
-echo ' <VirtualHost *:80>
-
-	ServerAdmin webmaster@localhost
-	DocumentRoot /var/www/eden.wise.E10.com
-	ServerName eden.wise.E10.com
-	ServerAlias www.eden.wise.E10.com
-</VirtualHost>
-' > /etc/apache2/sites-available/strix.operation.wise.E10.com.con
-  ```
-setelah itu masuk ke folder apache2 dengan menggunakan command
-```
-cd /etc/apache2
-  ```
-  jika sudah dalam folder maka konfigurasi file ports.conf menjadi seperti dibawah
-```
-
-echo '
-
-	Listen 80
-	Listen 15000
-	Listen 15500
-' > ports.conf
-  ```
-Jalankan file menggunakan
-```
-a2ensite strix.operation.wise.E10.com.conf
-  ```
-dan restart apache2 menggunakan
-```
-service apache2 restart
-  ```
+-
 
 ### Soal 15
 dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy (15)

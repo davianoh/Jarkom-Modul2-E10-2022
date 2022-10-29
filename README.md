@@ -534,19 +534,115 @@ service apache2 restart
 dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy (15)
 
 #### Jawaban
--
+Buat username dan password baru dengan command berikut. Username yang dipakai adalah Twilight dan password-nya opStrix,
+
+```
+htpasswd -c /etc/apache2/.htpasswd Twilight
+```
+dan akan muncul diterminal perintah untuk type new password.
+
+Buka file general.mecha.wise.E10.com.conf dan tambahkan seperti konfigurasi seperti :
+```
+<Directory /var/www/general.mecha.wise.E10.com>
+		Options +FollowSymLinks -Multiviews
+		AllowOverride All
+</Directory>
+
+# Avaliable loglevels: trance8, ..., tracel, debug, info, notice, warn,
+# error, crit, alert, emerg.
+# It is also posible to configure the loglevel for partcular
+# modules, e.g.
+#LogLevel info ssl:warn
+
+```
+
+Kemudian membuat file .htaccess pada folder /var/www/general.mecha.wise.E10.com dan menambahkan konfigurasi :
+```
+AuthType Basic
+AuthName "Restricted Content"
+AuthUserFile /etc/apache2.htpasswd
+Require valid-user
+```
+
+Restart apache
+```
+service apache2 restart
+```
+
+Melakukan testing di SSS dan Garden untuk cek apakah autentikasi berhasil dibuat
+
+```
+lynx general.mecha.wise.E10.com:15000 atau general.mecha.wise.E10.com:15500
+
+lynx www.general.mecha.wise.E10.com:15000 atau www.general.mecha.wise.E10.com:15500
+```
 
 ### Soal 16
 dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com (16).
 
 #### Jawaban
--
+Buka file 000-default.conf dan tambahkan seperti konfigurasi dibawah pada Eden.
+```
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/html
+
+<Directory /var/www/general.mecha.wise.E10.com>
+		Options +FollowSymLinks -Multiviews
+		AllowOverride All
+</Directory>
+```
+
+membuat file .htaccess pada folder /var/www/html dan tambahkan seperti konfigurasi dibawah untuk me-redirect menggunakan RewriteEngine.
+```
+RewriteEngine On
+RewriteBase /~new/
+RewriteCond %{HTTP_HOST} ^10\.3\.2\4$
+RewriteRule ^(.*)$ http://www.wise.E10.com/$1 [L,R=301]
+```
+
+Kemudian Restart apache
+```
+service apache2 restart
+```
+
+Lakukan testing pada SSS dan Garden untuk cek redirect.
+
+```
+lynx 10.3.2.4
+```
 
 ### Soal 17
 Karena website www.eden.wise.yyy.com semakin banyak pengunjung dan banyak modifikasi sehingga banyak gambar-gambar yang random, maka Loid ingin mengubah request gambar yang memiliki substring “eden” akan diarahkan menuju eden.png. Bantulah Agent Twilight dan Organisasi WISE menjaga perdamaian! (17)
 
 #### Jawaban
--
+Buka file super.wise.E10.com.conf dan tambahkan seperti konfigurasi dibawah pada Eden,
+```
+<Directory /var/www/general.mecha.wise.E10.com>
+		Options +FollowSymLinks -Multiviews
+		AllowOverride All
+</Directory>
+```
+
+Buat file .htaccess pada folder /var/www/super.wise.E10.com dan menambahkan konfigurasi berikut.
+
+```
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)eden(.*)$ http://www.super.wise.E10.com/public/images/eden.png [L,R]
+```
+
+Lalu restart apache
+```
+service apache2 restart
+```
+Melakukan testing di SSS dan Garden untuk cek apakah request berhasil dibuat
+
+```
+lynx super.wise.E10.com/public/images/eden.png
+
+lynx www.super.wise.E10.com/public/images/eden.png
+```
 
 ## Pembagian Tugas
 | Nama                        | Nomor      |

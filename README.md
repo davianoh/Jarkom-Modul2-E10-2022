@@ -25,35 +25,222 @@
 ## Soal 1
 WISE akan dijadikan sebagai DNS Master, Berlint akan dijadikan DNS Slave, dan Eden akan digunakan sebagai Web Server. Terdapat 2 Client yaitu SSS, dan Garden. Semua node terhubung pada router Ostania, sehingga dapat mengakses internet (1)
 ### Jawaban
--
+- Pertama kami membuat topologi jaringan pada GNS seperti pada gambar, lalu diatur konfigurasi tiap node sesuai dengan IP kelompok kami yaitu 192.197 pada bagian `Edit Network Configuration`. 
+
+Detailnya yaitu : 
+1. Ostania
+  ```
+auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inet static
+	address 192.197.1.1
+	netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+	address 192.197.2.1
+	netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+	address 192.197.3.1
+	netmask 255.255.255.0
+  ```
+  
+2. WISE 
+  ```
+auto eth0
+iface eth0 inet static
+	address 192.197.3.2
+	netmask 255.255.255.0
+	gateway 192.197.3.1
+  ```
+  
+3. SSS
+```
+auto eth0
+iface eth0 inet static
+	address 192.197.1.2
+	netmask 255.255.255.0
+	gateway 192.197.1.1
+```
+
+4. Garden
+```
+auto eth0
+iface eth0 inet static
+	address 192.197.1.3
+	netmask 255.255.255.0
+	gateway 192.197.1.1
+```
+
+5. Berlint
+```
+auto eth0
+iface eth0 inet static
+	address 192.197.2.2
+	netmask 255.255.255.0
+	gateway 192.197.2.1
+```
+
+6. Eden
+```
+auto eth0
+iface eth0 inet static
+	address 192.197.2.3
+	netmask 255.255.255.0
+	gateway 192.197.2.1
+```
+
+Lalu tidak lupa untuk menghubungkan semua node ubuntu cabang dari Ostania agar dapat terhubung dengan internet dari Ostania. Caranya sebagai berikut : 
+1. Pada Ostania dipanggil `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.197.0.0/16`. Lalu cek resolv.conf nya pada path `/etc/resolv.conf`. Didapatkan nameserver 192.168.122.1
+
+2. Lalu pada tiap node ubuntu lainnya, spesifikkan nameserver dari Ostania tersebut pada file /etc/resolv.conf masing2 dengan cara `echo nameserver 192.168.122.1 > /etc/resolv.conf`
+
 
 ## Soal 2
 bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise (2).
 ### Jawaban
--
+- Pertama lakukan instalasi bind9 pada node WISE sebagai DNS utama dengan fungsi `apt-get update` dan `apt-get install bind9 -y`. 
 
+Lalu ubah file berikut : 
+```
+echo 'zone "wise.E10.com" {
+        type master;
+        notify yes;
+        also-notify { 192.197.2.2; };
+        allow-transfer { 192.197.2.2; };
+        allow-transfer { 192.168.2.3; };
+        file "/etc/bind/wise/wise.E10.com";
+};' > /etc/bind/named.conf.local
+```
+Kemudian buat direktori baru dan copy db ke dalam folder tersebut dan beri nama yang sesuai
+```
+//mkdir /etc/bind/wise
+cp /etc/bind/db.local /etc/bind/wise/wise.E10.com
+```
+
+Lalu ubah isi dari file tersebut
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     wise.E10.com. root.wise.E10.com. (
+                     2022100601         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@               IN      NS      wise.E10.com.
+@               IN      A       192.197.3.2     ; IP Wise
+www             IN      CNAME   wise.E10.com.
+//eden          IN      A       192.197.2.3     ; IP Eden
+ns1             IN      A       192.197.2.3     ; IP Eden
+eden            IN      NS      ns1
+//www.eden      IN      CNAME   eden.wise.E10.com.
+n2                  IN  NS        192.197.2.2   ; IP Berlint
+operation           IN  NS        ns2
+' > /etc/bind/wise/wise.E10.com
+```
+Terakhir lalukan restart bind9. `service bind9 restart`
+
+Kemudian tinggal pada setiap node client, tambahkan `nameserver 192.197.3.2` pada file resolv.conf. Node tersebut kemudian seharusnya sudah dapat mengakses website
 
 ## Soal 3
 Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden (3).
 ### Jawaban
--
-
+- Pertama buka file wise.E10.com dan edit sesuai dengan konfigurasi berikut : 
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     eden.wise.E10.com. root.eden.wise.E10.com. (
+                     2022100601         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@               IN      NS      eden.wise.E10.com.
+@               IN      A       192.197.2.3     ; IP Eden
+www             IN      CNAME   eden.wise.E10.com.
+' > /etc/bind/wise/eden.wise.E10.com
+```
+Kemudian tambahkan konfigurasi ini pada file named.conf.local : 
+```
+echo 'zone "eden.wise.E10.com" {
+        type master;
+        file "/etc/bind/wise/eden.wise.E10.com";
+};' >> /etc/bind/named.conf.local
+```
+Seharusnya, subdomain sudah dapat diakses di node client. 
 
 ## Soal 4
  Buat juga reverse domain untuk domain utama (4).
 ### Jawaban
--
+- Tambahkan konfigurasi berikut pada file named.conf.local di WISE, dimana IP merupakan IP reverse dari sebenarnya : 
+```
+echo 'zone "3.197.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/wise/3.197.192.in-addr.arpa";
+};' >> /etc/bind/named.conf.local
+```
+Lalu copy file db.local ke dalam folder wise dan ubah namanya `cp /etc/bind/db.local /etc/bind/wise/3.197.192.in-addr.arpa`
+Kemudian konfigur isi dari file tersebut sebagai berikut : 
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     wise.E10.com. root.wise.E10.com. (
+                     2022100601         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+3.197.192.in-addr.arpa.  IN      NS      wise.E10.com.
+2                        IN      PTR     wise.E10.com. ; Byte ke-4 WISE
+
+' > /etc/bind/wise/3.197.192.in-addr.arpa
+```
+Lalu restart bind9
+Pada node client, lakukan installasi dnsutils memakai `apt-get update` dan `apt-get install dnsutils -y`, kemudian coba tes memakai command berikut : `host -t PTR 192.197.3.2`. Harusnya akan menunjukkan nama dari website IP tersebut. 
 
 ## Soal 5
 buatlah juga Berlint sebagai DNS Slave untuk domain utama WISE(5).
 ### Jawaban
--
+- Modifikasi file named.conf.local pada WISE sesuai konfigurasi berikut : 
+```
+echo 'zone "wise.E10.com" {
+        type master;
+        notify yes;
+        also-notify { 192.197.2.2; };
+        allow-transfer { 192.197.2.2; };
+        allow-transfer { 192.168.2.3; };
+        file "/etc/bind/wise/wise.E10.com";
+};' > /etc/bind/named.conf.local
+```
+Restart bind9, lalu pada node berlint, install bind9 kemudian edit file named.conf.local sebagai berikut : 
+```
+echo 'zone "wise.E10.com" {
+    type slave;
+    masters { 192.197.3.2; }; // Masukan IP EniesLobby tanpa tanda petik
+    file "/var/lib/bind/wise.E10.com";
+};' > /etc/bind/named.conf.local
+service bind9 restart
+```
+restart bind9, Lalu pada node client, kita juga perlu menambahkan nameserver IP Berlint. Bila sudah semua, maka website seharusnya sudah dapat diakses melalui Berlint ataupun WISE. 
 
 ## Soal 6
 buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation (6).
 ### Jawaban
--
-
+- Buka file wise.E10.com lalu pada bagian bawah tambahkan 
 
 ## Soal 7
 buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden (7).

@@ -382,25 +382,99 @@ Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan 
 Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja (11).
 
 #### Jawaban
--
+Buka file /etc/apache2/sites-available/eden.wise.E10.com.conf kemudian tambahkan konfigurasi dibawah ini
+ ```
+echo ' 
+
+	<Directory/var/www/wise.E10.com>
+     		Options +Indexes
+ 	</Directory>
+' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
+  ```
+Setelah itu restart apache2 dengan 
+   ```
+service apache2 restart
+  ```
 
 ### Soal 12
 Tidak hanya itu, Loid juga ingin menyiapkan error file 404.html pada folder /error untuk mengganti error kode pada apache (12)
 
 #### Jawaban
--
-
+Buka lagi file /etc/apache2/sites-available/eden.wise.E10.com.conf, kemudian tambahkan konfigurasi seperti dibawah ini
+   ```
+echo ' 
+	ErrorDocument 404 /error/404.html
+' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
+  ```
+setelah itu restart apache2 dengan 
+   ```
+service apache2 restart
+  ```
 ### Soal 13
 Loid juga meminta Franky untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.eden.wise.yyy.com/public/js menjadi www.eden.wise.yyy.com/js (13).
 
 #### Jawaban
--
+Buka lagi file /etc/apache2/sites-available/eden.wise.E10.com.conf, kemudian tambahkan konfigurasi seperti dibawah ini
+   ```
+echo ' 
+	 Alias "/assets/js" "/var/www/wise.E10.com/assets/javascript"
+' >> /etc/apache2/sites-available/eden.wise.E10.com.conf
+  ```
+setelah itu restart apache2 dengan 
+   ```
+service apache2 restart
+  ```
 
 ### Soal 14
 Loid meminta agar www.strix.operation.wise.yyy.com hanya bisa diakses dengan port 15000 dan port 15500 (14)
 
 #### Jawaban
--
+jika sreix.operation.wise.zip sudah di extract maka lansung buat direktori dengan nama
+   ```
+mkdir /var/www/strix.operation.wise.E10.com
+
+  ```
+Setelah itu copy isi zip ke /var/www/strix.operation.wise.E10.com
+     ```
+cp ~/strix.operation.wise/* /var/www/strix.operation.wise.E10.com
+  ```
+Jika sudah maka copy 000-default.conf ke /etc/apache2/sites-available/strix.operation.wise.E10.com.conf
+     ```
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/strix.operation.wise.E10.com.conf
+  ```
+Setelah itu buka etc/apache2/sites-available/strix.operation.wise.E10.com.conf kemudian konfigurasi seperti dibawah ini
+  ```
+echo ' <VirtualHost *:80>
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/eden.wise.E10.com
+	ServerName eden.wise.E10.com
+	ServerAlias www.eden.wise.E10.com
+</VirtualHost>
+' > /etc/apache2/sites-available/strix.operation.wise.E10.com.con
+  ```
+setelah itu masuk ke folder apache2 dengan menggunakan command
+```
+cd /etc/apache2
+  ```
+  jika sudah dalam folder maka konfigurasi file ports.conf menjadi seperti dibawah
+```
+
+echo '
+
+	Listen 80
+	Listen 15000
+	Listen 15500
+' > ports.conf
+  ```
+Jalankan file menggunakan
+```
+a2ensite strix.operation.wise.E10.com.conf
+  ```
+dan restart apache2 menggunakan
+```
+service apache2 restart
+  ```
 
 ### Soal 15
 dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy (15)

@@ -94,6 +94,8 @@ iface eth0 inet static
 	gateway 192.197.2.1
 ```
 
+<img width="780" alt="topologi" src="https://user-images.githubusercontent.com/87480529/198831839-329de6bf-9aeb-4bea-bf64-d889e44b6782.png">
+
 Lalu tidak lupa untuk menghubungkan semua node ubuntu cabang dari Ostania agar dapat terhubung dengan internet dari Ostania. Caranya sebagai berikut : 
 1. Pada Ostania dipanggil `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.197.0.0/16`. Lalu cek resolv.conf nya pada path `/etc/resolv.conf`. Didapatkan nameserver 192.168.122.1
 
